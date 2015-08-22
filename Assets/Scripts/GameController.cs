@@ -8,7 +8,7 @@ using Monster.Planets;
 using Monster.Utils;
 
 namespace Monster {
-    public class Hex : MonoBehaviour {
+    public class GameController : MonoBehaviour {
         private static float SQRT_3_2 = Mathf.Sqrt(3f) / 2f;
 
         public float Scale = 1.0f;
@@ -21,8 +21,8 @@ namespace Monster {
         //TODO: move to own space
         public CameraController _CamController;
 
-        private Dictionary<int, PlanetController> _Planets = new Dictionary<int, PlanetController>();
-        private List<PlanetController> _VisitedPlanets = new List<PlanetController>();
+        private Dictionary<Vector2, PlanetController> _ActivePlanets = new Dictionary<Vector2, PlanetController>();
+        private List<Vector2> _VisitedPlanets = new List<Vector2>();
 
         private List<Vector2> _PlanetPositions = new List<Vector2>();
         private List<Vector2> _NewPlanetPositions = new List<Vector2>();
@@ -65,10 +65,33 @@ namespace Monster {
             _RetiredPlanetPositions = _PlanetPositions.Except((IEnumerable<Vector2>) planetPositions).ToList();
             Debug.Log("[Hex] old: " + _RetiredPlanetPositions.Count + " new: " + _NewPlanetPositions.Count);
 
+            /*
+            foreach (Vector2 pos in _RetiredPlanetPositions) {
+                PlanetController pc = _ActivePlanets[pos];
+                Destroy(pc.gameObject);
+                _ActivePlanets.Remove(pos);
+            }
+
+            foreach (Vector2 pos in _NewPlanetPositions) {
+                PlanetController pc = CreatePlanet(pos);
+                _ActivePlanets.Add(pos, pc);
+                _VisitedPlanets.Add(pos);
+            }
+            */
+
+            Debug.Log("[Game] Planets: " + _ActivePlanets.Count + " Visited " + _VisitedPlanets.Count);
+
             _PlanetPositions = planetPositions;
         }
 
+        private PlanetController CreatePlanet(Vector2 pos) {
+            GameObject planetGO = Instantiate(Resources.Load("Planet") as GameObject);
+            planetGO.transform.position = pos;
+            return planetGO.GetComponent<PlanetController>();
+        }
+
         public void OnDrawGizmos() {
+            return;
             DrawList(_PlanetPositions, Color.cyan);
             DrawList(_NewPlanetPositions, Color.white);
             DrawList(_RetiredPlanetPositions, Color.blue);

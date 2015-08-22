@@ -31,15 +31,13 @@ namespace Monster.Planets {
         private List<Vector3> _PlanetVertices = new List<Vector3>();
 
         public void Awake() {
-            _OuterMesh = gameObject.AddComponent<MeshFilter>();
-
-            GameObject meshChild = new GameObject();
             _InnerMesh = Inner.AddComponent<MeshFilter>();
+            _OuterMesh = gameObject.AddComponent<MeshFilter>();
             Redraw();
         }
 
         public void Update() {
-            if (true) {
+            if (RedrawPlanet) {
                 Redraw();
                 RedrawPlanet = false;
 
