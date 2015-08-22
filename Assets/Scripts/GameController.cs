@@ -65,7 +65,6 @@ namespace Monster {
             _RetiredPlanetPositions = _PlanetPositions.Except((IEnumerable<Vector2>) planetPositions).ToList();
             Debug.Log("[Hex] old: " + _RetiredPlanetPositions.Count + " new: " + _NewPlanetPositions.Count);
 
-            /*
             foreach (Vector2 pos in _RetiredPlanetPositions) {
                 PlanetController pc = _ActivePlanets[pos];
                 Destroy(pc.gameObject);
@@ -77,10 +76,10 @@ namespace Monster {
                 _ActivePlanets.Add(pos, pc);
                 _VisitedPlanets.Add(pos);
             }
-            */
 
             Debug.Log("[Game] Planets: " + _ActivePlanets.Count + " Visited " + _VisitedPlanets.Count);
 
+            _PlanetPositions.Clear();
             _PlanetPositions = planetPositions;
         }
 
@@ -91,7 +90,6 @@ namespace Monster {
         }
 
         public void OnDrawGizmos() {
-            return;
             DrawList(_PlanetPositions, Color.cyan);
             DrawList(_NewPlanetPositions, Color.white);
             DrawList(_RetiredPlanetPositions, Color.blue);
