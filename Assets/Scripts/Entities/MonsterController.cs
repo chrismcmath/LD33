@@ -7,8 +7,8 @@ namespace Monster.Entities {
 
         public void Update() {
             transform.position += new Vector3(
-                    Input.GetAxis("Horizontal") * Speed,
-                    Input.GetAxis("Vertical") * Speed,
+                    Input.GetAxis("Horizontal") * Speed * Time.deltaTime,
+                    Input.GetAxis("Vertical") * Speed * Time.deltaTime,
                     0f);
         }
     }

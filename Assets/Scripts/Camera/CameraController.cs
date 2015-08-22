@@ -10,6 +10,7 @@ namespace Monster.Camera {
         public float Padding = 2f;
         public float Dampening = 0.1f;
         public Bounds SearchBounds;
+        public Bounds ExistenceBounds;
 
         public Transform[] DEBUG_PointsOfInterest;
 
@@ -30,7 +31,8 @@ namespace Monster.Camera {
             }
         }
 
-        public void Update() {
+        public void LateUpdate() {
+            UpdateBounds();
             UpdatePointsOfInterest();
         }
 
@@ -48,6 +50,11 @@ namespace Monster.Camera {
             } else {
                 Debug.Log(t.name + " not found");
             }
+        }
+
+        public void UpdateBounds() {
+            SearchBounds.center = transform.position;
+            ExistenceBounds.center = transform.position;
         }
 
         private void UpdatePointsOfInterest() {
@@ -111,6 +118,10 @@ namespace Monster.Camera {
                 Gizmos.color = Color.yellow;
                 DebugUtils.DrawBounds(_DebugBounds);
             }
+            Gizmos.color = Color.white;
+            DebugUtils.DrawBounds(SearchBounds);
+            Gizmos.color = Color.red;
+            DebugUtils.DrawBounds(ExistenceBounds);
         }
     }
 }
