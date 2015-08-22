@@ -1,0 +1,15 @@
+#Chris
+.local.vimrc
+tags
+tags.meta
+
+#Mono Nonsense
+*.csproj
+*.sln
+*.userprefs
+
+#Folders
+Builds/
+Library/
+Temp/
+Timelapse/
