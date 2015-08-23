@@ -12,8 +12,7 @@ namespace Monster.Behaviours {
         public float BoostSpeed = 100f;
         public float MaxHorizontalGroundSpeed = 0.5f;
         public float MaxHorizontalAirSpeed = 0.6f;
-        public float AirGravity = 1f;
-        public float GroundGravity = 1f;
+        public float Gravity = 10f;
 
 		private Vector2 _GravityDirection = Vector2.zero; 
         private Quaternion _TargetRotation;
@@ -37,7 +36,7 @@ namespace Monster.Behaviours {
         private void UpdateGravity() {
             _GravityDirection = GetGravityDirection();
 
-            _Rigidbody.AddForce(_GravityDirection * GroundGravity, ForceMode2D.Force);
+            _Rigidbody.AddForce(_GravityDirection * Gravity, ForceMode2D.Force);
             _TargetRotation = Quaternion.Euler(new Vector3(0f, 0f, VectorUtils.GetAngle(Vector2.down, _GravityDirection)));
         }
 

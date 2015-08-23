@@ -10,15 +10,23 @@ namespace Monster.Behaviours {
         public float AirSpeed = 10f;
         public float JumpSpeed = 20f;
         public float JumpForwardSpeed = 2f;
+        public float DiveSpeed = 10f;
         public float BoostSpeed = 100f;
         public float MaxHorizontalGroundSpeed = 0.5f;
         public float MaxHorizontalAirSpeed = 0.6f;
         public float AirGravity = 60;
         public float GroundGravity = 100f;
+        public float DiveDrag = 2f;
+        public float NormalDrag = 1f;
+        public float DiveTime = 1f;
+
+        private float _DiveTimer = 0f;
 
         public float JumpDisableTimeout = 0.1f;
 
         private Quaternion _TargetRotation;
+
+        private bool _Diving = false;
 
         private bool _Grounded = false;
 		private float _LastJumpTime = 0f; 
@@ -40,18 +48,32 @@ namespace Monster.Behaviours {
         protected override void OnAction1Down() {
 			CheckGrounded();
 
-            if (_Grounded) {
+            if (_Grounded || _Diving) {
                 PerformJump(); 
 			} else {
                 PerformBoost(); 
-				//_AnimationController.Fall();
+			}
+		}
+
+        protected override void OnAction2Down() {
+			CheckGrounded();
+
+            if (_Diving) {
+                PerformJump();
+            } else if (_Grounded) {
+                PerformDive(); 
+			} else {
+                PerformAirDive();
 			}
 		}
 		
-		protected override void OnAction2Down() {
-		}
-
         protected override void UpdateContinuousInput() {
+            if (_Diving && _DiveTimer < 0f) {
+                PerformJump();
+            }
+
+            _DiveTimer -= Time.deltaTime;
+
             UpdateDirection();
 		}
 
@@ -64,6 +86,7 @@ namespace Monster.Behaviours {
                 OnTouchGround();
             } else if (_Grounded && !ColliderUtils.IsIntersecting(_GroundCollider, "Planet")) {
                 _Grounded = false;
+                _Diving = false;
                 _ParticleSystem.Stop();
             }
         }
@@ -99,11 +122,18 @@ namespace Monster.Behaviours {
         }
 	
         private void OnTouchGround() {
+            GetComponentInChildren<Animator>().Play("Run");
             //_AnimationController.Land();
             //_SoundController.Footstep();
         }
 
         private void PerformJump() {
+            Debug.Log("jump");
+            _Diving = false;
+            _Rigidbody.drag = NormalDrag;
+
+            GetComponentInChildren<Animator>().Play("Jump");
+
             _LastJumpTime = _TimeActive;
 
             Vector3 force = -1f *_GravityDirection * JumpSpeed;
@@ -114,9 +144,23 @@ namespace Monster.Behaviours {
         }
 
         private void PerformBoost() {
+            Vector3 force = -1f *_GravityDirection * BoostSpeed * _Controller.Power;
             _Controller.DrainPower();
-            Vector3 force = -1f *_GravityDirection * BoostSpeed;
             _Rigidbody.AddForce(force, ForceMode2D.Impulse);
+        }
+
+        private void PerformDive() {
+            Debug.Log("PerformDive");
+            _Diving = true;
+            _DiveTimer = DiveTime;
+            GetComponentInChildren<Animator>().Play("Dive");
+
+            Vector2 right = transform.localRotation * Vector2.right * _Controller.FacingVector.x;
+            _Rigidbody.drag = DiveDrag;
+            _Rigidbody.AddForce(right * DiveSpeed, ForceMode2D.Impulse);
+        }
+
+        private void PerformAirDive() {
         }
 
         private void UpdateRotation() {
@@ -170,26 +214,22 @@ namespace Monster.Behaviours {
         }
 
         public void OnTriggerEnter2D(Collider2D col) {
-            Debug.Log("? ? ? OnTriggerEnter2D col " + col.name);
+            //Debug.Log("? ? ? OnTriggerEnter2D col " + col.name);
             switch (col.tag) {
                 case "Coin":
                     col.transform.parent.GetComponent<CoinController>().Collect();
                     _Controller.AddPower();
                     break;
+                case "Human":
+                    //Vector2 vel = _Rigidbody.velocity.normalized + (-1f * _GravityDirection.normalized);
+                    Vector2 vel = _Rigidbody.velocity.normalized;
+                    col.transform.parent.GetComponent<HumanController>().Attacked(vel);
+                    break;
             }
         }
 
         public void OnCollisionEnter2D(Collision2D col) {
-            Debug.Log("? ? ? ? ? ? ? ? ? ? col " + col.collider.name);
-            switch (col.collider.tag) {
-                case "Human":
-                    //Vector2 vel = _Rigidbody.velocity.normalized + (-1f * _GravityDirection.normalized);
-                    Vector2 vel = _Rigidbody.velocity.normalized;
-                    col.collider.transform.parent.GetComponent<HumanController>().Attacked(vel);
-                    break;
-                default:
-                    break;
-            }
+            //Debug.Log("? ? ? ? ? ? ? ? ? ? col " + col.collider.name);
         }
     }
 }

@@ -12,6 +12,9 @@ namespace Monster.Entities {
         public Image PowerImage;
 
         private float _Power = 0f;
+        public float Power {
+            get { return _Power; }
+        }
 
         public void Awake() {
             Behaviour = gameObject.AddComponent<IdleBehaviour>();
@@ -33,8 +36,11 @@ namespace Monster.Entities {
         }
 
         private IEnumerator AddPowerAsync() {
-            yield return new WaitForSeconds(1f);
-            _Power += 0.1f;
+            float target = Mathf.Min(1f, _Power + 0.1f);
+            while (_Power < target) {
+                _Power += 0.01f;
+                yield return null;
+            }
         }
 
         private IEnumerator DrainPowerAsync() {

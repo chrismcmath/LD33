@@ -12,9 +12,10 @@ namespace Monster {
         private static float SQRT_3_2 = Mathf.Sqrt(3f) / 2f;
 
         public float Scale = 1.0f;
+        public float EventHorizon = 50f;
 
         public Transform Canvas;
-        public Transform PointsEnd;
+        public RectTransform PointsEnd;
 
         private float _CachedScale;
         private float _Height = 0f;
@@ -57,7 +58,11 @@ namespace Monster {
                     closestMagnitude = (pos - p.Key).magnitude;
                 }
             }
-            return closestPlanet;
+            if (closestMagnitude > EventHorizon) {
+                return null;
+            } else {
+                return closestPlanet;
+            }
         }
 
         /*
