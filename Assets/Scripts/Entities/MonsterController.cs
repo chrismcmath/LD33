@@ -31,7 +31,8 @@ namespace Monster.Entities {
         }
 
         public void FixedUpdate() {
-            Vector2 right = Vector2.right;
+            Vector2 right = transform.localRotation * Vector2.right;
+            
             Vector2 moveVector = ControllerUtils.GetHorizontalMovement() * Speed * Time.deltaTime * right;
             _Rigidbody.AddForce(moveVector, ForceMode2D.Force);
 
@@ -53,7 +54,6 @@ namespace Monster.Entities {
             //float mag = (_HostPlanet.transform.position - transform.position).magnitude;
             //float gravitationalForce = 
 
-            Debug.Log("add force: " + (gravityDirection * Time.deltaTime * Gravity));
             _Rigidbody.AddForce(gravityDirection * Time.deltaTime * Gravity, ForceMode2D.Force);
             _TargetRotation = Quaternion.Euler(new Vector3(0f, 0f, GetAngle(Vector2.down, gravityDirection)));
         }

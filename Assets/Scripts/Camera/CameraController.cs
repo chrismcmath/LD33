@@ -8,7 +8,8 @@ namespace Monster.Camera {
     public class CameraController : MonoBehaviour {
         public float MinDistance = 10f;
         public float Padding = 2f;
-        public float Dampening = 0.1f;
+        public float FollowSpeed = 10f;
+        public float RotationSpeed = 10f;
         public Bounds SearchBounds;
         public Bounds ExistenceBounds;
 
@@ -67,17 +68,8 @@ namespace Monster.Camera {
                     poiBounds.center.y,
                     -1f * Mathf.Max(MinDistance, GetDistance(poiBounds)));
 
-            Vector3 tweenedPos;
-            float tweenedRot;
-            if (Dampening > 0f) {
-                tweenedPos = _Camera.transform.position + ((targetPos - _Camera.transform.position) * (Time.deltaTime / Dampening));
-                tweenedRot = _Camera.transform.rotation.eulerAngles.z + (((Player.rotation.eulerAngles.z + 90f) - _Camera.transform.rotation.eulerAngles.z) * (Time.deltaTime / Dampening));
-            } else {
-                tweenedPos = targetPos;
-                tweenedRot = Player.rotation.eulerAngles.z + 90f;
-            }
-            _Camera.transform.position = tweenedPos;
-            //_Camera.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, tweenedRot));
+            _Camera.transform.position = Vector3.Lerp(_Camera.transform.position, targetPos, Time.deltaTime * FollowSpeed);
+            _Camera.transform.rotation = Quaternion.Slerp(_Camera.transform.rotation, Player.rotation, Time.deltaTime * RotationSpeed);
         }
 
         private float GetDistance(Bounds poiBounds) {

@@ -6,7 +6,7 @@ using Monster.Utils;
 
 namespace Monster.Planets {
     public class PlanetController : MonoBehaviour {
-        public float ATMOSPHERE_TO_RADIUS_RATIO = 8f;
+        public const float ATMOSPHERE_TO_RADIUS_RATIO = 7f;
         public float PERLIN_SIZE = 10f;
 
         public GameObject Inner; 
@@ -18,8 +18,7 @@ namespace Monster.Planets {
         public float PlanetRadiusMin = 10f;
         public float PlanetRadiusMax = 20f;
 
-        public float PlanetHeightMin = 1f;
-        public float PlanetHeightMax = 20f;
+        public float PlanetHeightRange = 10f;
 
         // trying to describe each step around a circle
         public float PlanetArcMin = 1f;
@@ -121,6 +120,7 @@ namespace Monster.Planets {
             Atmosphere.material.SetColor("_TintColor", complement);
             Atmosphere.transform.localScale = Vector2.one * _Radius * ATMOSPHERE_TO_RADIUS_RATIO; 
 
+            float prevHeight = 0f;
             for (float angle = 0f; angle < 360f;) {
                 Vector2 direction = Vector2.right;
 
@@ -134,10 +134,11 @@ namespace Monster.Planets {
                 nextDirection.y = direction.x * sinTheta + direction.y * cosTheta;
                 direction = nextDirection;
 
-                Vector3 vertex = (((Vector3) direction) * _Radius) * GetPerlinNumber(PlanetHeightMin, PlanetHeightMax, angle);
+                float height = prevHeight + (GetPerlinNumber(-PlanetHeightRange, PlanetHeightRange, angle) * _Radius);
+                Vector3 vertex = ((Vector3) direction) * (_Radius + height);
                 _PlanetVertices.Add(vertex);
 
-                angle += GetPerlinNumber(PlanetArcMin, PlanetArcMax, angle);
+                angle += GetPerlinNumber(PlanetArcMin, PlanetArcMax, angle) * (1f/ _Radius);
             }
         }
 
