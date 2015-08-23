@@ -36,7 +36,7 @@ namespace Monster.Entities {
         }
 
         public void Update() {
-            HostPlanet = Game.GetClosestPlanet((Vector2) transform.position);
+            HostPlanet = Game.GetClosestPlanet((Vector2) transform.position, gameObject.name == "Player");
 
             if (Behaviour != null) {
                 Behaviour.UpdateBehaviour();

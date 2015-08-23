@@ -5,7 +5,7 @@ using Monster.Utils;
 
 namespace Monster.Behaviours {
     public class IdleHumanBehaviour : HumanBehaviour {
-        public float GroundSpeed = 0f;
+        private float GroundSpeed = 10f;
         public float AirSpeed = 10f;
         public float JumpSpeed = 20f;
         public float JumpForwardSpeed = 2f;
@@ -18,6 +18,7 @@ namespace Monster.Behaviours {
         public float JumpDisableTimeout = 0.1f;
 
         private Quaternion _TargetRotation;
+        private float _Speed = 0f;
 
         private bool _Grounded = false;
 		private float _LastJumpTime = 0f; 
@@ -26,6 +27,15 @@ namespace Monster.Behaviours {
 		protected override void OnSwitchIn() {
             _Rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
             _ParticleSystem.Stop();
+
+            float random = Random.Range(0f, 1f);
+            if (random < 0.3f) {
+                _Speed = GroundSpeed;
+            } else if (random < 0.6f) {
+                _Speed = GroundSpeed * -1;
+            } else {
+                GroundSpeed = 0f;
+            }
 		}
 
         protected override void UpdateRigidbody() {
@@ -56,25 +66,15 @@ namespace Monster.Behaviours {
             Vector2 right = transform.localRotation * Vector2.right;
             float axis = 0f;
 
-            if (axis > 0f) {
+            if (_Speed > 0f) {
                 _HumanController.FacingVector = Vector2.right;
-            } else if (axis < 0f) {
+            } else if (_Speed < 0f) {
                 _HumanController.FacingVector = -1 * Vector2.right;
             }
 
             bool facingRight = _HumanController.FacingVector.x == 1;
 
-            float speed = _Grounded ?
-                GroundSpeed :
-                AirSpeed;
-            float max = _Grounded ?
-                MaxHorizontalGroundSpeed :
-                MaxHorizontalAirSpeed;
-
-            speed = Mathf.Min(speed, max);
-            speed *= _HumanController.FacingVector.x;
-
-            //_Rigidbody.AddForce(right * speed, ForceMode2D.Impulse);
+            _Rigidbody.AddForce(right * _Speed, ForceMode2D.Force);
 
             if (_Grounded) {
                 //_AnimationController.Running(true);

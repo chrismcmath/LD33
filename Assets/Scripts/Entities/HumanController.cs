@@ -33,6 +33,7 @@ namespace Monster.Entities {
         }
 
         public void Attacked(Vector2 direction) {
+            _Rigidbody.velocity = Vector2.zero;
             _Rigidbody.AddForce(direction * 30f, ForceMode2D.Impulse);
             RemoveMonsterBehaviour();
             Behaviour = gameObject.AddComponent<HumanHitBehaviour>();

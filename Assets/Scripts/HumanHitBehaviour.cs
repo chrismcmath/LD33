@@ -12,7 +12,7 @@ namespace Monster.Behaviours {
         public float BoostSpeed = 100f;
         public float MaxHorizontalGroundSpeed = 0.5f;
         public float MaxHorizontalAirSpeed = 0.6f;
-        public float Gravity = 10f;
+        public float Gravity = 1f;
 
 		private Vector2 _GravityDirection = Vector2.zero; 
         private Quaternion _TargetRotation;
@@ -61,8 +61,12 @@ namespace Monster.Behaviours {
         public void OnCollisionEnter2D(Collision2D col) {
             Debug.Log("human OnCollisionEnter2D: " + col.collider.name);
             if (col.collider.gameObject.layer == LayerMask.NameToLayer("Planet")) {
-                _HumanController.RemoveMonsterBehaviour();
-                _HumanController.Behaviour = _HumanController.gameObject.AddComponent<IdleHumanBehaviour>();
+                if (_HumanController == null) {
+                    Destroy(col.collider.gameObject);
+                } else {
+                    _HumanController.RemoveMonsterBehaviour();
+                    _HumanController.Behaviour = _HumanController.gameObject.AddComponent<IdleHumanBehaviour>();
+                }
             }
         }
     }

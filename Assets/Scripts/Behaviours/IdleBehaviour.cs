@@ -11,7 +11,8 @@ namespace Monster.Behaviours {
         public float JumpSpeed = 20f;
         public float JumpForwardSpeed = 2f;
         public float DiveSpeed = 10f;
-        public float BoostSpeed = 100f;
+        public float BoostSpeed = 150f;
+        private float HurtSpeed = 20f;
         public float MaxHorizontalGroundSpeed = 0.5f;
         public float MaxHorizontalAirSpeed = 0.6f;
         public float AirGravity = 60;
@@ -128,11 +129,11 @@ namespace Monster.Behaviours {
         }
 
         private void PerformJump() {
-            Debug.Log("jump");
             _Diving = false;
             _Rigidbody.drag = NormalDrag;
 
             GetComponentInChildren<Animator>().Play("Jump");
+            _Controller.PlayJump();
 
             _LastJumpTime = _TimeActive;
 
@@ -146,6 +147,7 @@ namespace Monster.Behaviours {
         private void PerformBoost() {
             Vector3 force = -1f *_GravityDirection * BoostSpeed * _Controller.Power;
             _Controller.DrainPower();
+            _Controller.Play("boost");
             _Rigidbody.AddForce(force, ForceMode2D.Impulse);
         }
 
@@ -154,6 +156,7 @@ namespace Monster.Behaviours {
             _Diving = true;
             _DiveTimer = DiveTime;
             GetComponentInChildren<Animator>().Play("Dive");
+            _Controller.Play("dive");
 
             Vector2 right = transform.localRotation * Vector2.right * _Controller.FacingVector.x;
             _Rigidbody.drag = DiveDrag;
@@ -222,8 +225,18 @@ namespace Monster.Behaviours {
                     break;
                 case "Human":
                     //Vector2 vel = _Rigidbody.velocity.normalized + (-1f * _GravityDirection.normalized);
-                    Vector2 vel = _Rigidbody.velocity.normalized;
-                    col.transform.parent.GetComponent<HumanController>().Attacked(vel);
+                    if (_Diving) {
+                        Vector2 vel = ((_Rigidbody.velocity.normalized * 3) + (_GravityDirection.normalized * -1f)).normalized;
+                        col.transform.parent.GetComponent<HumanController>().Attacked(vel);
+                        _Controller.PlayHitHuman();
+                    } else {
+                        _Controller.DrainPower();
+                        _Controller.FacingVector *= -1f;
+                        _Controller.Game.CamController.ScreenShake = 1f;
+                        Vector2 right = transform.localRotation * Vector2.right * _Controller.FacingVector.x;
+                        _Rigidbody.AddForce(right * HurtSpeed, ForceMode2D.Impulse);
+                        _Controller.Play("damage");
+                    }
                     break;
             }
         }

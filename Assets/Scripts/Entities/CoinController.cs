@@ -22,6 +22,8 @@ namespace Monster.Entities {
         protected Rigidbody2D _Rigidbody;
         protected ParticleSystem _ParticleSystem;
 
+        public AudioSource PickUp;
+
 		private Vector2 _GravityDirection = Vector2.zero; 
 
         public void Awake() {
@@ -74,6 +76,7 @@ namespace Monster.Entities {
         }
 
         public void Collect() {
+            PickUp.Play();
             _ParticleSystem.startLifetime = 10f;
             _ParticleSystem.emissionRate = 1f;
             _ParticleSystem.startSpeed = 10f;

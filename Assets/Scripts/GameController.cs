@@ -46,7 +46,7 @@ namespace Monster {
             UpdatePlanetPositions(CamController.ExistenceBounds);
         }
 
-        public PlanetController GetClosestPlanet(Vector2 pos) {
+        public PlanetController GetClosestPlanet(Vector2 pos, bool useEventHorizon) {
             List<Vector2> keys = _ActivePlanets.Keys.ToList();
 
             PlanetController closestPlanet = null;
@@ -58,7 +58,7 @@ namespace Monster {
                     closestMagnitude = (pos - p.Key).magnitude;
                 }
             }
-            if (closestMagnitude > EventHorizon) {
+            if (useEventHorizon && closestMagnitude > EventHorizon) {
                 return null;
             } else {
                 return closestPlanet;

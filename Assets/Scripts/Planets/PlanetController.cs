@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+using Monster.Entities;
 using Monster.Utils;
 
 namespace Monster.Planets {
@@ -23,6 +24,8 @@ namespace Monster.Planets {
         // trying to describe each step around a circle
         public float PlanetArcMin = 1f;
         public float PlanetArcMax = 20f;
+
+        private float SpawnerProbability = 0.1f;
 
         public bool RedrawPlanet = true;
 
@@ -121,6 +124,7 @@ namespace Monster.Planets {
             Atmosphere.transform.localScale = Vector2.one * _Radius * ATMOSPHERE_TO_RADIUS_RATIO; 
 
             float prevHeight = 0f;
+            Vector3 prevVertex = Vector3.zero;
             for (float angle = 0f; angle < 360f;) {
                 Vector2 direction = Vector2.right;
 
@@ -137,6 +141,21 @@ namespace Monster.Planets {
                 float height = prevHeight + (GetPerlinNumber(-PlanetHeightRange, PlanetHeightRange, angle) * _Radius);
                 Vector3 vertex = ((Vector3) direction) * (_Radius + height);
                 _PlanetVertices.Add(vertex);
+
+                float random = Random.Range(0f, 1f); 
+                Debug.Log("planet " + transform.position + " prevVertex: " + prevVertex + " random: " + random);
+                if (prevVertex != Vector3.zero && Random.Range(0f, 1f) < SpawnerProbability) {
+                    GameObject spawnerGO = Instantiate(Resources.Load("HumanSpawner") as GameObject);
+                    spawnerGO.transform.parent = transform;
+                    Vector3 pos = (vertex + (prevVertex - vertex)/2f) + transform.position;
+                    spawnerGO.transform.position = pos;
+                    spawnerGO.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, VectorUtils.GetAngle(Vector2.up, pos - transform.position)));
+                    spawnerGO.GetComponent<SpawnerController>().RoofRenderer.material.color = randomColor / 2;
+                    spawnerGO.GetComponent<SpawnerController>().HostPlanet = this;
+                }
+
+
+                prevVertex = vertex;
 
                 angle += GetPerlinNumber(PlanetArcMin, PlanetArcMax, angle) * (1f/ _Radius);
             }

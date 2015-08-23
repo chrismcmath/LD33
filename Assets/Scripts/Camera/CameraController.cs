@@ -11,6 +11,7 @@ namespace Monster.Camera {
         public float Padding = 2f;
         public float FollowSpeed = 10f;
         public float RotationSpeed = 10f;
+        public float ScreenShake = 0f;
         public Bounds SearchBounds;
         public Bounds ExistenceBounds;
 
@@ -26,6 +27,10 @@ namespace Monster.Camera {
             if (_Camera == null) {
                 Debug.LogError("[Camera] Could not find camera on gameobject");
             }
+        }
+
+        public void Update() {
+            ScreenShake *= 0.9f;
         }
 
         public void FixedUpdate() {
@@ -71,11 +76,18 @@ namespace Monster.Camera {
             _DebugBounds = poiBounds;
 
             Vector3 targetPos = new Vector3(
-                    poiBounds.center.x,
-                    poiBounds.center.y,
+                    //poiBounds.center.x,
+                    //poiBounds.center.y,
+                    Player.transform.position.x,
+                    Player.transform.position.y,
                     -1f * Mathf.Max(MinDistance, GetDistance(poiBounds)));
 
             _Camera.transform.position = Vector3.Lerp(_Camera.transform.position, targetPos, Time.deltaTime * FollowSpeed);
+            _Camera.transform.position += new Vector3(
+                    Random.Range(-1f, 1f) * ScreenShake,
+                    Random.Range(-1f, 1f) * ScreenShake,
+                    0f);
+
             _Camera.transform.rotation = Quaternion.Slerp(_Camera.transform.rotation, Player.transform.rotation, Time.deltaTime * RotationSpeed);
         }
 
@@ -95,7 +107,7 @@ namespace Monster.Camera {
             Vector2 max = Vector2.zero;
 
             UpdateBoundsFromPointOfInterest(Player.transform.position, ref min, ref max, true);
-            if (Player.GroundPoint != Vector2.zero) {
+            if (Player.HostPlanet != null) {
                 UpdateBoundsFromPointOfInterest(Player.GroundPoint, ref min, ref max, false);
             }
 
