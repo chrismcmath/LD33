@@ -28,8 +28,9 @@ namespace Monster.Camera {
             }
         }
 
-        public void Update() {
+        public void FixedUpdate() {
             UpdateBounds();
+            CompilePointsOfInterest();
             UpdatePointsOfInterest();
         }
 
@@ -52,6 +53,17 @@ namespace Monster.Camera {
         public void UpdateBounds() {
             SearchBounds.center = transform.position;
             ExistenceBounds.center = transform.position;
+        }
+
+        private void CompilePointsOfInterest() {
+            _PointsOfInterest.Clear();
+
+            foreach (GameObject poiGO in GameObject.FindGameObjectsWithTag("POI")) {
+                Vector2 pos = (Vector2) poiGO.transform.position;
+                if (SearchBounds.Contains(pos)) {
+                    _PointsOfInterest.Add(poiGO.transform);
+                }
+            }
         }
 
         private void UpdatePointsOfInterest() {

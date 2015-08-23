@@ -19,7 +19,7 @@ namespace Monster {
         private float _Width = 0f;
 
         //TODO: move to own space
-        public CameraController _CamController;
+        public CameraController CamController;
 
         private Dictionary<Vector2, PlanetController> _ActivePlanets = new Dictionary<Vector2, PlanetController>();
         private List<Vector2> _VisitedPlanets = new List<Vector2>();
@@ -39,7 +39,7 @@ namespace Monster {
                 _HalfWidth = _Width / 2f;
             }
 
-            UpdatePlanetPositions(_CamController.ExistenceBounds);
+            UpdatePlanetPositions(CamController.ExistenceBounds);
         }
 
         public PlanetController GetClosestPlanet(Vector2 pos) {

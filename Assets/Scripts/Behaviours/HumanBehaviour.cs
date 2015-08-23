@@ -11,9 +11,11 @@ namespace Monster.Behaviours {
 
         protected override bool SetupError() {
             bool hasError = !HasRigidbody() || !HasHitCollider() || !HasHumanController();
+            /*
             Debug.Log("r: " + HasRigidbody());
             Debug.Log("h: " + HasHitCollider());
             Debug.Log("c: " + HasHumanController());
+            */
             if (hasError) {
                 Debug.LogError("[HumanBehaviour] Could not load necessary controllers");
             }

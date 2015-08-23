@@ -12,8 +12,8 @@ namespace Monster.Behaviours {
         public float BoostSpeed = 100f;
         public float MaxHorizontalGroundSpeed = 0.5f;
         public float MaxHorizontalAirSpeed = 0.6f;
-        public float AirGravity = 60;
-        public float GroundGravity = 100f;
+        public float AirGravity = 10f;
+        public float GroundGravity = 1f;
 
         public float JumpDisableTimeout = 0.1f;
 
@@ -23,11 +23,9 @@ namespace Monster.Behaviours {
 		private float _LastJumpTime = 0f; 
 		private Vector2 _GravityDirection = Vector2.zero; 
 
-        private Vector2 DEBUG_HitPosition = Vector2.zero;
-        private Vector2 DEBUG_HitNormal = Vector2.zero;
-
 		protected override void OnSwitchIn() {
             _Rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
+            _ParticleSystem.Stop();
 		}
 
         protected override void UpdateRigidbody() {
@@ -35,18 +33,6 @@ namespace Monster.Behaviours {
             UpdateRotation();
         }
 
-        protected override void OnAction1Down() {
-            Debug.Log("OnAction1Down");
-			CheckGrounded();
-
-            if (_Grounded) {
-                //PerformJump(); 
-			} else {
-                //PerformBoost(); 
-				//_AnimationController.Fall();
-			}
-		}
-		
 		protected override void OnAction2Down() {
 		}
 
@@ -68,7 +54,7 @@ namespace Monster.Behaviours {
 
         private void UpdateDirection() {
             Vector2 right = transform.localRotation * Vector2.right;
-            float axis = ControllerUtils.GetHorizontalMovement();
+            float axis = 0f;
 
             if (axis > 0f) {
                 _HumanController.FacingVector = Vector2.right;
@@ -105,16 +91,11 @@ namespace Monster.Behaviours {
             _Grounded = false;
             _LastJumpTime = _TimeActive;
 
-            Vector3 force = -1f *_GravityDirection * JumpSpeed;
+            Vector3 force = -1f * _GravityDirection * JumpSpeed;
             _Rigidbody.AddForce(force, ForceMode2D.Impulse);
 
             Vector2 right = transform.localRotation * Vector2.right * _HumanController.FacingVector.x;
-            _Rigidbody.AddForce(right * JumpForwardSpeed, ForceMode2D.Impulse);
-        }
-
-        private void PerformBoost() {
-            Vector3 force = -1f *_GravityDirection * BoostSpeed;
-            _Rigidbody.AddForce(force, ForceMode2D.Impulse);
+            //_Rigidbody.AddForce(right * JumpForwardSpeed, ForceMode2D.Impulse);
         }
 
         private void UpdateRotation() {
@@ -137,7 +118,6 @@ namespace Monster.Behaviours {
         }
 
         private Vector2 GetGravityDirection() {
-            Debug.Log("GetGravityDirection, controller: " + _HumanController);
             if (_HumanController.HostPlanet == null) {
                 return Vector2.zero;
             }
@@ -148,24 +128,11 @@ namespace Monster.Behaviours {
             if (hit.collider != null) {
                 //Debug.Log("hit: " + hit.collider.name);
                 _HumanController.GroundPoint = hit.point;
-                DEBUG_HitPosition = hit.point;
-                DEBUG_HitNormal = hit.normal;
                 return -1 * hit.normal;
             } else {
                 _HumanController.GroundPoint = Vector2.zero;
             }
             return toPlanet;
-        }
-
-        public void OnDrawGizmos() {
-            Vector2 normalEnd = DEBUG_HitPosition + DEBUG_HitNormal; 
-
-            Gizmos.color = Color.red;
-            DebugUtils.DrawBounds(new Bounds(DEBUG_HitPosition, Vector2.one));
-            Gizmos.color = Color.cyan;
-            DebugUtils.DrawBounds(new Bounds(normalEnd, Vector2.one));
-
-            Debug.DrawLine(DEBUG_HitPosition, normalEnd, Color.white);
         }
     }
 }

@@ -12,6 +12,9 @@ namespace Monster.Behaviours {
         protected PolygonCollider2D _HitCollider;
         protected BoxCollider2D _GroundCollider;
 
+        //TODO: hacked in Start
+        protected ParticleSystem _ParticleSystem;
+
         protected float _TimeActive = 0f;
         public float TimeActive {
             get { return _TimeActive; }
@@ -34,7 +37,9 @@ namespace Monster.Behaviours {
                 return;
             }
 
+            _ParticleSystem = GetComponentInChildren<ParticleSystem>();
             OnSwitchIn();
+            Debug.Log("got particles: " + _ParticleSystem);
         }
 
         public void UpdateBehaviour() {

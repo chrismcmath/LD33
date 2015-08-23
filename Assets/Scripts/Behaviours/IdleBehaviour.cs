@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+using Monster.Entities;
 using Monster.Utils;
 
 namespace Monster.Behaviours {
@@ -31,12 +32,12 @@ namespace Monster.Behaviours {
 		}
 
         protected override void UpdateRigidbody() {
+            CheckGrounded();
             UpdateGravity();
             UpdateRotation();
         }
 
         protected override void OnAction1Down() {
-            Debug.Log("OnAction1Down");
 			CheckGrounded();
 
             if (_Grounded) {
@@ -51,7 +52,6 @@ namespace Monster.Behaviours {
 		}
 
         protected override void UpdateContinuousInput() {
-            CheckGrounded();
             UpdateDirection();
 		}
 
@@ -60,9 +60,11 @@ namespace Monster.Behaviours {
                     _TimeActive - _LastJumpTime > JumpDisableTimeout &&
                     ColliderUtils.IsIntersecting(_GroundCollider, "Planet")) {
                 _Grounded = true;
+                _ParticleSystem.Play();
                 OnTouchGround();
             } else if (_Grounded && !ColliderUtils.IsIntersecting(_GroundCollider, "Planet")) {
                 _Grounded = false;
+                _ParticleSystem.Stop();
             }
         }
 
@@ -102,7 +104,6 @@ namespace Monster.Behaviours {
         }
 
         private void PerformJump() {
-            _Grounded = false;
             _LastJumpTime = _TimeActive;
 
             Vector3 force = -1f *_GravityDirection * JumpSpeed;
@@ -165,6 +166,28 @@ namespace Monster.Behaviours {
             DebugUtils.DrawBounds(new Bounds(normalEnd, Vector2.one));
 
             Debug.DrawLine(DEBUG_HitPosition, normalEnd, Color.white);
+        }
+
+        public void OnTriggerEnter2D(Collider2D col) {
+            Debug.Log("? ? ? OnTriggerEnter2D col " + col.name);
+            switch (col.tag) {
+                case "Coin":
+                    col.transform.parent.GetComponent<CoinController>().Collect();
+                    break;
+            }
+        }
+
+        public void OnCollisionEnter2D(Collision2D col) {
+            Debug.Log("? ? ? ? ? ? ? ? ? ? col " + col.collider.name);
+            switch (col.collider.tag) {
+                case "Human":
+                    //Vector2 vel = _Rigidbody.velocity.normalized + (-1f * _GravityDirection.normalized);
+                    Vector2 vel = _Rigidbody.velocity.normalized;
+                    col.collider.transform.parent.GetComponent<HumanController>().Attacked(vel);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
