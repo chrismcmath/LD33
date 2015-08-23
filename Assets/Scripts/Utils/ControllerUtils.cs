@@ -8,16 +8,28 @@ namespace Monster.Utils {
             return Input.GetAxis("Horizontal");
         }
 
-        public static bool ActionButton() {
-            return Input.GetButton("Action");
+        public static bool Action1Button() {
+            return Input.GetButton("Action1");
         }
 
-        public static bool ActionDown() {
-            return Input.GetButtonDown("Action");
+        public static bool Action1Down() {
+            return Input.GetButtonDown("Action1");
         }
 
-        public static bool ActionUp() {
-            return Input.GetButtonUp("Action");
+        public static bool Action1Up() {
+            return Input.GetButtonUp("Action1");
+        }
+
+        public static bool Action2Button() {
+            return Input.GetButton("Action2");
+        }
+
+        public static bool Action2Down() {
+            return Input.GetButtonDown("Action2");
+        }
+
+        public static bool Action2Up() {
+            return Input.GetButtonUp("Action2");
         }
     }
 }

@@ -7,9 +7,9 @@ using Monster.Planets;
 using Monster.Utils;
 
 namespace Monster.Entities {
-    public class MonsterController : EntityController {
+    public class HumanController : EntityController {
         public void Awake() {
-            Behaviour = gameObject.AddComponent<IdleBehaviour>();
+            Behaviour = gameObject.AddComponent<IdleHumanBehaviour>();
         }
     }
 }

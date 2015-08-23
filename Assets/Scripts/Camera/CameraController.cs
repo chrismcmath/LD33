@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+using Monster.Entities;
 using Monster.Utils;
 
 namespace Monster.Camera {
@@ -13,8 +14,7 @@ namespace Monster.Camera {
         public Bounds SearchBounds;
         public Bounds ExistenceBounds;
 
-        public Transform[] DEBUG_PointsOfInterest;
-        public Transform Player;
+        public MonsterController Player;
 
         private UnityEngine.Camera _Camera;
         private List<Transform> _PointsOfInterest = new List<Transform>();
@@ -26,14 +26,9 @@ namespace Monster.Camera {
             if (_Camera == null) {
                 Debug.LogError("[Camera] Could not find camera on gameobject");
             }
-
-            //TODO: remove
-            foreach (Transform t in DEBUG_PointsOfInterest) {
-                RegisterPointOfInterest(t);
-            }
         }
 
-        public void LateUpdate() {
+        public void Update() {
             UpdateBounds();
             UpdatePointsOfInterest();
         }
@@ -69,7 +64,7 @@ namespace Monster.Camera {
                     -1f * Mathf.Max(MinDistance, GetDistance(poiBounds)));
 
             _Camera.transform.position = Vector3.Lerp(_Camera.transform.position, targetPos, Time.deltaTime * FollowSpeed);
-            _Camera.transform.rotation = Quaternion.Slerp(_Camera.transform.rotation, Player.rotation, Time.deltaTime * RotationSpeed);
+            _Camera.transform.rotation = Quaternion.Slerp(_Camera.transform.rotation, Player.transform.rotation, Time.deltaTime * RotationSpeed);
         }
 
         private float GetDistance(Bounds poiBounds) {
@@ -87,23 +82,32 @@ namespace Monster.Camera {
             Vector2 min = Vector2.zero;
             Vector2 max = Vector2.zero;
 
-            bool isFirst = true;
-            foreach (Transform t in _PointsOfInterest) {
-                if (isFirst) {
-                    min = t.position;
-                    max = t.position;
-                    isFirst = false;
-                }
-                min = new Vector2(
-                        Mathf.Min(min.x, t.position.x - Padding),
-                        Mathf.Min(min.y, t.position.y - Padding));
-                max = new Vector2(
-                        Mathf.Max(max.x, t.position.x + Padding),
-                        Mathf.Max(max.y, t.position.y + Padding));
+            UpdateBoundsFromPointOfInterest(Player.transform.position, ref min, ref max, true);
+            if (Player.GroundPoint != Vector2.zero) {
+                UpdateBoundsFromPointOfInterest(Player.GroundPoint, ref min, ref max, false);
             }
+
+            foreach (Transform t in _PointsOfInterest) {
+                UpdateBoundsFromPointOfInterest(t.position, ref min, ref max, false);
+            }
+
             Bounds bounds = new Bounds();
             bounds.SetMinMax(min, max);
             return bounds;
+        }
+
+        private void UpdateBoundsFromPointOfInterest(Vector2 point, ref Vector2 min, ref Vector2 max, bool isFirst) {
+                if (isFirst) {
+                    min = point;
+                    max = point;
+                }
+
+                min = new Vector2(
+                        Mathf.Min(min.x, point.x - Padding),
+                        Mathf.Min(min.y, point.y - Padding));
+                max = new Vector2(
+                        Mathf.Max(max.x, point.x + Padding),
+                        Mathf.Max(max.y, point.y + Padding));
         }
 
         public void OnDrawGizmos() {

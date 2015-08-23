@@ -64,7 +64,7 @@ namespace Monster.Planets {
         }
 
         private void RecreateMeshes() {
-            RecreateMesh(_InnerMesh, 0.9f);
+            RecreateMesh(_InnerMesh, 0.99f);
             RecreateMesh(_OuterMesh, 1.0f);
         }
 
