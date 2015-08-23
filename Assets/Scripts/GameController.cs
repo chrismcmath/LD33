@@ -42,7 +42,38 @@ namespace Monster {
             UpdatePlanetPositions(_CamController.ExistenceBounds);
         }
 
-        public void UpdatePlanetPositions(Bounds bounds) {
+        public PlanetController GetClosestPlanet(Vector2 pos) {
+            List<Vector2> keys = _ActivePlanets.Keys.ToList();
+
+            PlanetController closestPlanet = null;
+            float closestMagnitude = Mathf.Infinity;
+            foreach (KeyValuePair<Vector2, PlanetController> p in _ActivePlanets) {
+
+                if ((pos - p.Key).magnitude < closestMagnitude) {
+                    closestPlanet = p.Value;
+                    closestMagnitude = (pos - p.Key).magnitude;
+                }
+            }
+            return closestPlanet;
+        }
+
+        /*
+        public Vector2 GetClosestPlanetPoint(Vector2 pos) {
+            List<Vector2> keys = _ActivePlanets.Keys.ToList();
+
+            Vector2 closest = Vector2.zero;
+            float closestMagnitude = Mathf.Infinity;
+            foreach (Vector2 p in keys) {
+                if ((pos - p).magnitude < closestMagnitude) {
+                    closest = p;
+                    closestMagnitude = (pos - p).magnitude;
+                }
+            }
+            return closest;
+        }
+        */
+
+        private void UpdatePlanetPositions(Bounds bounds) {
             List<Vector2> planetPositions = new List<Vector2>();
 
             float hexMinX = Mathf.Floor(bounds.min.x / _Width) + 1;
@@ -63,7 +94,6 @@ namespace Monster {
 
             _NewPlanetPositions = planetPositions.Except((IEnumerable<Vector2>) _PlanetPositions).ToList();
             _RetiredPlanetPositions = _PlanetPositions.Except((IEnumerable<Vector2>) planetPositions).ToList();
-            Debug.Log("[Hex] old: " + _RetiredPlanetPositions.Count + " new: " + _NewPlanetPositions.Count);
 
             foreach (Vector2 pos in _RetiredPlanetPositions) {
                 PlanetController pc = _ActivePlanets[pos];
@@ -77,9 +107,9 @@ namespace Monster {
                 _VisitedPlanets.Add(pos);
             }
 
-            Debug.Log("[Game] Planets: " + _ActivePlanets.Count + " Visited " + _VisitedPlanets.Count);
+            //Debug.Log("[Hex] old: " + _RetiredPlanetPositions.Count + " new: " + _NewPlanetPositions.Count);
+            //Debug.Log("[Game] Planets: " + _ActivePlanets.Count + " Visited " + _VisitedPlanets.Count);
 
-            _PlanetPositions.Clear();
             _PlanetPositions = planetPositions;
         }
 

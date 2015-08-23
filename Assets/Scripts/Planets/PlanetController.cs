@@ -6,9 +6,11 @@ using Monster.Utils;
 
 namespace Monster.Planets {
     public class PlanetController : MonoBehaviour {
+        public float ATMOSPHERE_TO_RADIUS_RATIO = 8f;
         public float PERLIN_SIZE = 10f;
 
         public GameObject Inner; 
+        public MeshRenderer Atmosphere;
 
         //NOTE: Radius is like the general size
         //NOTE: Height will define mountains etc
@@ -30,7 +32,7 @@ namespace Monster.Planets {
         private MeshFilter _InnerMesh;
         private List<Vector3> _PlanetVertices = new List<Vector3>();
 
-        public void Awake() {
+        public void Start() {
             _InnerMesh = Inner.AddComponent<MeshFilter>();
             _OuterMesh = gameObject.AddComponent<MeshFilter>();
             Redraw();
@@ -40,11 +42,11 @@ namespace Monster.Planets {
             if (RedrawPlanet) {
                 Redraw();
                 RedrawPlanet = false;
-
             }
         }
 
         public void OnDrawGizmos() {
+            return;
             Gizmos.color = Color.black;
             if (_PlanetVertices.Count < 1) {
                 return;
@@ -89,6 +91,11 @@ namespace Monster.Planets {
                 vertices.Add((Vector2) v);
             }
             Triangulator triangulator = new Triangulator(vertices.ToArray());
+
+            //TODO: hack, trying to reuse me cast
+            PolygonCollider2D col = gameObject.AddComponent<PolygonCollider2D>();
+            col.SetPath(0, vertices.ToArray());
+
             return triangulator.Triangulate();
         }
 
@@ -100,6 +107,19 @@ namespace Monster.Planets {
             _PlanetVertices.Clear();
 
             _Radius = GetPerlinNumber(PlanetRadiusMin, PlanetRadiusMax);
+            Color randomColor = ColorUtils.ColorFromHSV(GetPerlinNumber(0f, 360f), 1f, 1f);
+            Inner.GetComponent<MeshRenderer>().material.color = randomColor;
+            GetComponent<MeshRenderer>().material.color = randomColor / 2;
+
+            float h, s, v;
+            ColorUtils.ColorToHSV(randomColor, out h, out s, out v);
+
+            h += 180f;
+            h = h > 360f ? h - 360f : h;
+
+            Color complement = ColorUtils.ColorFromHSV(h, s, v);
+            Atmosphere.material.SetColor("_TintColor", complement);
+            Atmosphere.transform.localScale = Vector2.one * _Radius * ATMOSPHERE_TO_RADIUS_RATIO; 
 
             for (float angle = 0f; angle < 360f;) {
                 Vector2 direction = Vector2.right;

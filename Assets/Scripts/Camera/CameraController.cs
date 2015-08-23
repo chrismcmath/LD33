@@ -13,6 +13,7 @@ namespace Monster.Camera {
         public Bounds ExistenceBounds;
 
         public Transform[] DEBUG_PointsOfInterest;
+        public Transform Player;
 
         private UnityEngine.Camera _Camera;
         private List<Transform> _PointsOfInterest = new List<Transform>();
@@ -67,12 +68,16 @@ namespace Monster.Camera {
                     -1f * Mathf.Max(MinDistance, GetDistance(poiBounds)));
 
             Vector3 tweenedPos;
+            float tweenedRot;
             if (Dampening > 0f) {
                 tweenedPos = _Camera.transform.position + ((targetPos - _Camera.transform.position) * (Time.deltaTime / Dampening));
+                tweenedRot = _Camera.transform.rotation.eulerAngles.z + (((Player.rotation.eulerAngles.z + 90f) - _Camera.transform.rotation.eulerAngles.z) * (Time.deltaTime / Dampening));
             } else {
                 tweenedPos = targetPos;
+                tweenedRot = Player.rotation.eulerAngles.z + 90f;
             }
             _Camera.transform.position = tweenedPos;
+            //_Camera.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, tweenedRot));
         }
 
         private float GetDistance(Bounds poiBounds) {
