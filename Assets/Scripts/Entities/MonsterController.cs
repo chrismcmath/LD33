@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 using Monster.Behaviours;
@@ -8,9 +9,9 @@ using Monster.Utils;
 
 namespace Monster.Entities {
     public class MonsterController : EntityController {
-        public RectTransform PowerBarTransform;
+        public Image PowerImage;
 
-        public float Power = 0f;
+        private float _Power = 0f;
 
         public void Awake() {
             Behaviour = gameObject.AddComponent<IdleBehaviour>();
@@ -19,7 +20,28 @@ namespace Monster.Entities {
         public void Update() {
             base.Update();
 
-            PowerBarTransform.sizeDelta += Vector2.right;
+            //PowerBarTransform.sizeDelta += Vector2.right;
+            PowerImage.fillAmount = _Power;
+        }
+
+        public void AddPower() {
+            StartCoroutine(AddPowerAsync());
+        }
+
+        public void DrainPower() {
+            StartCoroutine(DrainPowerAsync());
+        }
+
+        private IEnumerator AddPowerAsync() {
+            yield return new WaitForSeconds(1f);
+            _Power += 0.1f;
+        }
+
+        private IEnumerator DrainPowerAsync() {
+            while (_Power > 0f) {
+                _Power -= 0.01f;
+                yield return null;
+            }
         }
     }
 }

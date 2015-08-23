@@ -114,6 +114,7 @@ namespace Monster.Behaviours {
         }
 
         private void PerformBoost() {
+            _Controller.DrainPower();
             Vector3 force = -1f *_GravityDirection * BoostSpeed;
             _Rigidbody.AddForce(force, ForceMode2D.Impulse);
         }
@@ -173,6 +174,7 @@ namespace Monster.Behaviours {
             switch (col.tag) {
                 case "Coin":
                     col.transform.parent.GetComponent<CoinController>().Collect();
+                    _Controller.AddPower();
                     break;
             }
         }

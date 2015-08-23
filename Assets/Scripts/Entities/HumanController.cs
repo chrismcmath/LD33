@@ -15,7 +15,6 @@ namespace Monster.Entities {
         }
 
         public void Attacked(Vector2 direction) {
-            Debug.Log("Attacked " + direction);
             _Rigidbody.AddForce(direction * 30f, ForceMode2D.Impulse);
             RemoveMonsterBehaviour();
             Behaviour = gameObject.AddComponent<HumanHitBehaviour>();
@@ -28,6 +27,9 @@ namespace Monster.Entities {
         private void SpawnCoin(Vector2 direction) {
             GameObject coinGO = Instantiate(Resources.Load("Coin") as GameObject);
             coinGO.transform.parent = HostPlanet.transform;
+            coinGO.transform.position = transform.position;
+            coinGO.GetComponent<CoinController>().Game = Game;
+            coinGO.GetComponent<CoinController>().HostPlanet = HostPlanet;
             coinGO.GetComponent<Rigidbody2D>().AddForce(direction * 30f, ForceMode2D.Impulse);
         }
     }

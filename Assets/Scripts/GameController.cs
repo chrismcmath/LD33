@@ -13,6 +13,9 @@ namespace Monster {
 
         public float Scale = 1.0f;
 
+        public Transform Canvas;
+        public Transform PointsEnd;
+
         private float _CachedScale;
         private float _Height = 0f;
         private float _HalfWidth = 0f;
