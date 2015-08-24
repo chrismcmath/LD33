@@ -14,9 +14,27 @@ namespace Monster.Entities {
 
         protected Rigidbody2D _Rigidbody;
 
+        public AudioSource Voice;
+
         public void Awake() {
             Behaviour = gameObject.AddComponent<IdleHumanBehaviour>();
             _Rigidbody = GetComponent<Rigidbody2D>();
+        }
+
+        public void PlayHit() {
+            int i = Random.Range(0, 3);
+            Play(string.Format("enemy_hit{0}", i));
+        }
+
+        public void PlayFly() {
+            int i = Random.Range(0, 3);
+            Play(string.Format("enemy_fly{0}", i));
+        }
+
+        public void Play(string name) {
+            Voice.Stop();
+            Voice.clip = Resources.Load(string.Format(name), typeof(AudioClip)) as AudioClip;
+            Voice.Play();
         }
 
         public void Update() {
@@ -37,6 +55,8 @@ namespace Monster.Entities {
             _Rigidbody.AddForce(direction * 30f, ForceMode2D.Impulse);
             RemoveMonsterBehaviour();
             Behaviour = gameObject.AddComponent<HumanHitBehaviour>();
+
+            PlayFly();
 
             _CoinCount = 10;
             _Direction = direction;

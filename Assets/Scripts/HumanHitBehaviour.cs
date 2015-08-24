@@ -62,7 +62,7 @@ namespace Monster.Behaviours {
             Debug.Log("human OnCollisionEnter2D: " + col.collider.name);
             if (col.collider.gameObject.layer == LayerMask.NameToLayer("Planet")) {
                 if (_HumanController == null) {
-                    Destroy(col.collider.gameObject);
+                    return;
                 } else {
                     _HumanController.RemoveMonsterBehaviour();
                     _HumanController.Behaviour = _HumanController.gameObject.AddComponent<IdleHumanBehaviour>();

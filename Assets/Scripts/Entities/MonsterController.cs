@@ -37,7 +37,6 @@ namespace Monster.Entities {
         }
 
         public void Play(string name) {
-            Debug.Log("play " + name);
             Voice.Stop();
             Voice.clip = Resources.Load(string.Format(name), typeof(AudioClip)) as AudioClip;
             Voice.Play();
@@ -80,7 +79,7 @@ namespace Monster.Entities {
 
         private IEnumerator DrainPowerAsync() {
             while (_Power > 0f) {
-                _Power -= 0.01f;
+                _Power -= 0.1f;
                 yield return null;
             }
         }

@@ -39,7 +39,6 @@ namespace Monster.Behaviours {
 
             _ParticleSystem = GetComponentInChildren<ParticleSystem>();
             OnSwitchIn();
-            Debug.Log("got particles: " + _ParticleSystem);
         }
 
         public void UpdateBehaviour() {

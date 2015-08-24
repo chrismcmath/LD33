@@ -236,6 +236,7 @@ namespace Monster.Behaviours {
                         Vector2 right = transform.localRotation * Vector2.right * _Controller.FacingVector.x;
                         _Rigidbody.AddForce(right * HurtSpeed, ForceMode2D.Impulse);
                         _Controller.Play("damage");
+                        col.transform.parent.GetComponent<HumanController>().PlayHit();
                     }
                     break;
             }
